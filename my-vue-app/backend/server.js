@@ -126,6 +126,9 @@ app.get('/srs', async (req, res) => {
           }
         });
       });
+      const itemCount = items.length;
+      const hasHereItems = items.some(item => item.status === 'Here');
+
       const appointments = await new Promise((resolve, reject) => {
         db.all("SELECT * FROM appointments WHERE incident_id = ?", [sr.incident_id], (err, appointments) => {
           if (err) {
@@ -135,7 +138,7 @@ app.get('/srs', async (req, res) => {
           }
         });
       });
-      return {...sr, items, appointments};
+      return { ...sr, items, appointments, itemCount, hasHereItems };
     }));
 
     res.json(srsWithItems);
@@ -143,6 +146,7 @@ app.get('/srs', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 app.get('/items', (req, res) => {
   db.all(`SELECT * FROM items`, [], (err, rows) => {

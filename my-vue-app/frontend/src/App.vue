@@ -131,6 +131,7 @@
 <script>
 import axios from 'axios';
 import UploadForm from './components/UploadForm.vue';
+import 'materialize-css/dist/js/materialize.min.js';
 
 export default {
   name: 'App',
@@ -270,11 +271,18 @@ export default {
     areAllItemsHere(items) {
       return items.length > 0 && items.every(item => item.status === 'Here');
     },
+    hasSomeItemsHere(items) {
+      return items.length > 0 && items.some(item => item.status === 'Here') && items.some(item => item.status !== 'Here');
+    },
     headerClass(items) {
       if (items.length === 0) {
         return 'no-items';
+      } else if (this.areAllItemsHere(items)) {
+        return 'all-items-here';
+      } else if (this.hasSomeItemsHere(items)) {
+        return 'some-items-here';
       }
-      return this.areAllItemsHere(items) ? 'all-items-here' : '';
+      return '';
     },
     abbreviateDivision(division) {
       return this.divisionAbbreviations[division] || division;
@@ -302,15 +310,15 @@ export default {
   mounted() {
     document.addEventListener('DOMContentLoaded', () => {
       const elems = document.querySelectorAll('.collapsible');
-      M.Collapsible.init(elems);
+      window.M.Collapsible.init(elems);
 
       const sidenavElems = document.querySelectorAll('.sidenav');
-      M.Sidenav.init(sidenavElems);
+      window.M.Sidenav.init(sidenavElems);
     });
   },
   updated() {
     const elems = document.querySelectorAll('.collapsible');
-    M.Collapsible.init(elems);
+    window.M.Collapsible.init(elems);
   },
 };
 </script>
@@ -359,7 +367,11 @@ button {
 }
 
 .no-items {
-  background-color: white !important;
+  background-color: #fabcc2 !important;
+}
+
+.some-items-here {
+  background-color: rgb(254, 239, 203) !important;
 }
 
 .upload-form-wrapper {
