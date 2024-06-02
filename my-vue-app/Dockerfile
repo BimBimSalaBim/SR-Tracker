@@ -37,9 +37,6 @@ ENV OPENAI_API_KEY=''
 # Build the frontend
 RUN cd frontend && npm run build
 
-# Copy the parse_service_request.py script
-COPY parse_service_request.py ./
-
 # Expose the ports the apps run on
 EXPOSE 8080 5000
 
