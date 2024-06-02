@@ -8,9 +8,6 @@ WORKDIR /app
 COPY backend/package*.json ./backend/
 RUN cd backend && npm install
 
-# Install OpenAI Python library inside the virtual environment
-RUN pip install openai
-
 # Copy backend code
 COPY backend/ ./backend/
 
