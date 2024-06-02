@@ -551,4 +551,16 @@ button {
 .dark-mode .collapsible-body {
   background-color: #1f1f1f !important;
 }
+
+.dark-mode .all-items-here {
+  background-color: darkgreen !important;
+}
+
+.dark-mode .no-items {
+  background-color: darkred !important;
+}
+
+.dark-mode .some-items-here {
+  background-color: darkorange !important;
+}
 </style>
