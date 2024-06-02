@@ -1,13 +1,12 @@
 <template>
-  <div id="app">
+  <div :class="{'dark-mode': isDarkMode}" style="height: 100vh;" id="app">
     <nav>
       <div class="nav-wrapper">
-        <button data-target="slide-out" class="sidenav-trigger" style="border: 0px !important;">
+        <button data-target="slide-out" class="sidenav-trigger" :style="{ backgroundColor: isDarkMode ? '#1f1f1f !important' : '#398dd2 !important', border:'0px',padding: '1px' }">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" class="icon-xl-heavy">
             <path fill="currentColor" fill-rule="evenodd" d="M8.857 3h6.286c1.084 0 1.958 0 2.666.058.729.06 1.369.185 1.961.487a5 5 0 0 1 2.185 2.185c.302.592.428 1.233.487 1.961.058.708.058 1.582.058 2.666v3.286c0 1.084 0 1.958-.058 2.666-.06.729-.185 1.369-.487 1.961a5 5 0 0 1-2.185 2.185c-.592.302-1.232.428-1.961.487C17.1 21 16.227 21 15.143 21H8.857c-1.084 0-1.958 0-2.666-.058-.728-.06-1.369-.185-1.96-.487a5 5 0 0 1-2.186-2.185c-.302-.592-.428-1.232-.487-1.961C1.5 15.6 1.5 14.727 1.5 13.643v-3.286c0-1.084 0-1.958.058-2.666.06-.728.185-1.369.487-1.96A5 5 0 0 1 4.23 3.544c.592-.302 1.233-.428 1.961-.487C6.9 3 7.773 3 8.857 3M6.354 5.051c-.605.05-.953.142-1.216.276a3 3 0 0 0-1.311 1.311c-.134.263-.226.611-.276 1.216-.05.617-.051 1.41-.051 2.546v3.2c0 1.137 0 1.929.051 2.546.05.605.142.953.276 1.216a3 3 0 0 0 1.311 1.311c.263.134.611.226 1.216.276.617.05 1.41.051 2.546.051h.6V5h-.6c-1.137 0-1.929 0-2.546.051M11.5 5v14h3.6c1.137 0 1.929 0 2.546-.051.605-.05.953-.142 1.216-.276a3 3 0 0 0 1.311-1.311c.134-.263.226-.611.276-1.216.05-.617.051-1.41.051-2.546v-3.2c0-1.137 0-1.929-.051-2.546-.05-.605-.142-.953-.276-1.216a3 3 0 0 0-1.311-1.311c-.263-.134-.611-.226-1.216-.276C17.029 5.001 16.236 5 15.1 5zM5 8.5a1 1 0 0 1 1-1h1a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1M5 12a1 1 0 0 1 1-1h1a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1" clip-rule="evenodd"></path>
           </svg>
         </button>
-        <!-- <a href="#" data-target="slide-out" class="sidenav-trigger btn-floating btn-large teal lighten-1 show-on-large"><i class="material-icons">menu</i></a> -->
         <a href="#" class="brand-logo center">SR Tracker</a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
           <li>
@@ -24,8 +23,8 @@
     </div>
 
     <!-- Side Navigation -->
-    <ul id="slide-out" class="sidenav ">
-      <li style="background-color: #398dd2 !important;padding:1px;">
+    <ul id="slide-out" class="sidenav" :style="{ backgroundColor: isDarkMode ? '#1f1f1f !important' : 'white !important', padding: '1px' }">
+      <li :style="{ backgroundColor: isDarkMode ? '#1f1f1f !important' : '#398dd2 !important', padding: '1px' }">
         <h3 class="center-align white-text">Settings</h3>
       </li>
       <br/>
@@ -41,6 +40,9 @@
       </li>
       <li class="center-align">
         <button class="btn waves-effect waves-light" style="width: 80%;" @click="toggleViewArchived">{{ showArchived ? 'View Active Requests' : 'View Archived Requests' }}</button>
+      </li>
+      <li class="center-align">
+        <button class="btn waves-effect waves-light" style="width: 80%;" @click="toggleDarkMode">{{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}</button>
       </li>
     </ul>
 
@@ -110,14 +112,13 @@
                 <button class="btn-small red" @click="removeItem(item.id)">Remove</button>
               </div>
             </li>
-
           </ul>
           <div class="row">
-              <div class="col s12 right-align">
-                <button class="btn waves-effect waves-light" style="margin:5px;" @click="toggleAddItemForm(sr.incident_id)">Add Item</button>
-                <button class="btn waves-effect waves-light" style="margin:5px;" @click="autoPopulateUsingAI(sr.incident_id)">Auto Populate using AI</button>
-                <button class="btn waves-effect waves-light red" @click="archiveRequest(sr.incident_id)">Archive</button>
-              </div>
+            <div class="col s12 right-align">
+              <button class="btn waves-effect waves-light" style="margin:5px;" @click="toggleAddItemForm(sr.incident_id)">Add Item</button>
+              <button class="btn waves-effect waves-light" style="margin:5px;" @click="autoPopulateUsingAI(sr.incident_id)">Auto Populate using AI</button>
+              <button class="btn waves-effect waves-light red" @click="archiveRequest(sr.incident_id)">Archive</button>
+            </div>
           </div>
           <div v-if="showForm && currentIncidentId === sr.incident_id" class="row add-item-form">
             <div class="col s10">
@@ -155,6 +156,8 @@
     </ul>
   </div>
 </template>
+
+
 <script>
 import axios from 'axios';
 import UploadForm from './components/UploadForm.vue';
@@ -176,7 +179,8 @@ export default {
       newAppointmentDate: '',
       newAppointmentTime: '',
       searchQuery: '',
-      showArchived: false, // Add this line
+      showArchived: false, 
+      isDarkMode: localStorage.getItem('isDarkMode') === 'true', 
       divisionAbbreviations: {
         "Survey & Mapping & Property Division": "SMPD",
         "WATERWORKS DIVISION": "WWD",
@@ -187,7 +191,8 @@ export default {
         "ROAD MAINTENANCE DIVISION": "RMD",
         "LAND DEVELOPMENT DIVISION": "LDD",
         "HUMAN RESOURCES DIVISION": "HRD",
-        "GEOTECHNICAL & MATERIALS ENGINEERING DIVISION": "GMED"
+        "GEOTECHNICAL & MATERIALS ENGINEERING DIVISION": "GMED",
+        "STORMWATER MAINTENANCE DIVISION": "SWMD"
       }
     };
   },
@@ -206,20 +211,20 @@ export default {
       }
     },
     handleFileUpload(file) {
-        const formData = new FormData();
-        formData.append('file', file);
+      const formData = new FormData();
+      formData.append('file', file);
 
-        axios.post('http://localhost:5000/upload', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        }).then(response => {
-            console.log('Parsed data:', response.data.data);
-                        // Update your application state with the parsed data
-                        this.fetchSrs();
-        }).catch(error => {
-            console.error('Error uploading file:', error);
-        });
+      axios.post('http://localhost:5000/upload', formData, {
+          headers: {
+              'Content-Type': 'multipart/form-data'
+          }
+      }).then(response => {
+          console.log('Parsed data:', response.data.data);
+          // Update your application state with the parsed data
+          this.fetchSrs();
+      }).catch(error => {
+          console.error('Error uploading file:', error);
+      });
     },
     async exportData() {
       try {
@@ -272,6 +277,10 @@ export default {
       this.showArchived = !this.showArchived;
       this.fetchSrs();
     },
+    toggleDarkMode() { // Add this method to toggle dark mode
+      this.isDarkMode = !this.isDarkMode;
+      localStorage.setItem('isDarkMode', this.isDarkMode);
+    },
     async autoGenerateWithAIForAll() {
       try {
         const filteredSrs = this.srs.filter(sr => !sr.items || sr.items.length === 0);
@@ -283,10 +292,10 @@ export default {
       }
     },
     descriptionClass(sr) {
-          // If there are appointments, the description column will be smaller
-          let remainingCols = sr.appointments && sr.appointments.length > 0 ? 4 : 5;
-          return `col s${remainingCols}`;
-        },
+      // If there are appointments, the description column will be smaller
+      let remainingCols = sr.appointments && sr.appointments.length > 0 ? 4 : 5;
+      return `col s${remainingCols}`;
+    },
     updateItemStatus(item) {
       const status = item.status === 'Here' ? 'Not Here' : 'Here';
       axios.post(`http://localhost:5000/items/${item.id}`, { status }).then(() => {
@@ -314,34 +323,34 @@ export default {
         }
       }
     },
-  async updateOnBehalfOf(sr) {
-    try {
-      await axios.post(`http://localhost:5000/srs/${sr.incident_id}/update`, {
-        on_behalf_of: sr.on_behalf_of
-      });
-      this.fetchSrs();
-    } catch (error) {
-      console.error('Error updating on_behalf_of:', error);
-    }
-  },
-  async updateLocation(sr) {
-    try {
-      await axios.post(`http://localhost:5000/srs/${sr.incident_id}/update`, {
-        location: sr.location
-      });
-      this.fetchSrs();
-    } catch (error) {
-      console.error('Error updating location:', error);
-    }
-  },
-  async removeItem(itemId) {
-    try {
-      await axios.delete(`http://localhost:5000/items/${itemId}`);
-      this.fetchSrs();
-    } catch (error) {
-      console.error('Error removing item:', error);
-    }
-  },
+    async updateOnBehalfOf(sr) {
+      try {
+        await axios.post(`http://localhost:5000/srs/${sr.incident_id}/update`, {
+          on_behalf_of: sr.on_behalf_of
+        });
+        this.fetchSrs();
+      } catch (error) {
+        console.error('Error updating on_behalf_of:', error);
+      }
+    },
+    async updateLocation(sr) {
+      try {
+        await axios.post(`http://localhost:5000/srs/${sr.incident_id}/update`, {
+          location: sr.location
+        });
+        this.fetchSrs();
+      } catch (error) {
+        console.error('Error updating location:', error);
+      }
+    },
+    async removeItem(itemId) {
+      try {
+        await axios.delete(`http://localhost:5000/items/${itemId}`);
+        this.fetchSrs();
+      } catch (error) {
+        console.error('Error removing item:', error);
+      }
+    },
     toggleScheduleForm(incidentId) {
       this.currentIncidentId = incidentId;
       this.showScheduleForm = !this.showScheduleForm;
@@ -417,7 +426,6 @@ export default {
   },
 };
 </script>
-
 <style>
 @import 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css';
 
@@ -432,9 +440,11 @@ nav {
 }
 button {
   background-color: #398dd2 !important;
+  color: white !important;
 }
 .btn {
   background-color: #398dd2 !important;
+  color: white !important;
 }
 .item-content {
   display: flex;
@@ -507,5 +517,38 @@ button {
 
 .appointments h5 {
   margin-bottom: 10px;
+}
+
+/* Add dark mode styles */
+.dark-mode {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+.dark-mode nav {
+  background-color: #1f1f1f !important;
+}
+
+.dark-mode .btn {
+  background-color: #2c2c2c !important;
+}
+
+.dark-mode .collapsible-header {
+  background-color: #2c2c2c !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-mode .item {
+  background-color: #2c2c2c !important;
+}
+
+.dark-mode input,
+.dark-mode .upload-form-wrapper label {
+  background-color: #333 !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-mode .collapsible-body {
+  background-color: #1f1f1f !important;
 }
 </style>
