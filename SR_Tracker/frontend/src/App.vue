@@ -448,11 +448,31 @@ export default {
       } catch (error) {
         console.error('Error exporting checklist:', error);
       }
-    },
+    },  getFirstName(name, type) {
+    if (!name) return '';
+    // Check if the name is in "Last, First" format
+    if (name.includes(',')) {
+      if (type === 'first') {
+        return name.split(',')[1].trim();
+      } else if (type === 'last') {
+        return name.split(',')[0].trim();
+      }
+    } else {
+      // Otherwise, assume it's in "First Last" or "Last First" format
+      const nameParts = name.split(' ');
+      if (type === 'first') {
+        return nameParts[0];
+      } else if (type === 'last') {
+        return nameParts[nameParts.length - 1];
+      }
+    }
+  },
     generateEmail(sr) {
+       
+
+      const recipient = this.getFirstName(sr.on_behalf_of, 'first') || this.getFirstName(sr.customer_name, 'last');
       let emailBody = "Hello ";
 
-      const recipient = sr.on_behalf_of ? sr.on_behalf_of : sr.customer_name;
       emailBody += recipient + ",\n\n";
 
       emailBody += `All the items for Service Request #${sr.incident_id} have been received by inventory. I would like to schedule the delivery/install at your earliest convenience. Please let me know the best time to proceed.\n\n`;
