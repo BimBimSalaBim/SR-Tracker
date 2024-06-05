@@ -39,6 +39,9 @@
         <button class="btn waves-effect waves-light" style="width: 80%;" @click="autoGenerateWithAIForAll">Auto Generate with AI for All</button>
       </li>
       <li class="center-align">
+        <button class="btn waves-effect waves-light" style="width: 80%;" @click="exportChecklist">Export Checklist</button>
+      </li>
+      <li class="center-align">
         <button class="btn waves-effect waves-light" style="width: 80%;" @click="toggleViewArchived">{{ showArchived ? 'View Active Requests' : 'View Archived Requests' }}</button>
       </li>
       <li class="center-align">
@@ -390,6 +393,58 @@ export default {
     },
     abbreviateDivision(division) {
       return this.divisionAbbreviations[division] || division;
+    },
+    async exportChecklist() {
+      try {
+        const checklistData = this.srs
+          .filter(sr => sr.items.some(item => item.status !== 'Here'))
+          .map(sr => ({
+            incident_id: sr.incident_id,
+            customer_name: sr.customer_name,
+            items: sr.items.filter(item => item.status !== 'Here')
+          }));
+
+        let checklistHtml = `
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            h3 { color: #398dd2; }
+            ul { list-style-type: none; padding: 0; }
+            li { margin-bottom: 10px; }
+            .incident { margin-bottom: 20px; }
+            .item { margin-left: 20px; }
+          </style>
+        </head>
+        <body>
+          <h1 style="text-align: center;" >Checklist of Items Not Here</h1>`;
+
+        checklistData.forEach(sr => {
+          checklistHtml += `
+          <div class="incident">
+            <h3>Incident ID: ${sr.incident_id} - ${sr.customer_name}</h2>
+            <ul>`;
+          sr.items.forEach(item => {
+            checklistHtml += `<li class="item"> <input type="checkbox" /> ${item.item_description} - Quantity: ${item.quantity}</li>`;
+          });
+          checklistHtml += `</ul></div>`;
+        });
+
+        checklistHtml += `
+        </body>
+        </html>`;
+
+        const blob = new Blob([checklistHtml], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", url);
+        downloadAnchorNode.setAttribute("download", "checklist.html");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+      } catch (error) {
+        console.error('Error exporting checklist:', error);
+      }
     }
   },
   computed: {
