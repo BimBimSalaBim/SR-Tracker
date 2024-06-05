@@ -120,7 +120,10 @@
             <div class="col s12 right-align">
               <button class="btn waves-effect waves-light" style="margin:5px;" @click="toggleAddItemForm(sr.incident_id)">Add Item</button>
               <button class="btn waves-effect waves-light" style="margin:5px;" @click="autoPopulateUsingAI(sr.incident_id)">Auto Populate using AI</button>
-              <button class="btn waves-effect waves-light red" @click="archiveRequest(sr.incident_id)">Archive</button>
+            </div>
+            <div class="col s12 right-align">
+              <button class="btn waves-effect waves-light" style="margin: 5px;" @click="generateEmail(sr)">Generate Email</button>
+              <button class="btn waves-effect waves-light red" style="margin: 5px;" @click="archiveRequest(sr.incident_id)">Archive</button>
             </div>
           </div>
           <div v-if="showForm && currentIncidentId === sr.incident_id" class="row add-item-form">
@@ -134,7 +137,7 @@
           </div>
           <div class="row">
             <div class="col s12 right-align">
-              <button class="btn waves-effect waves-light" @click="toggleScheduleForm(sr.incident_id)" v-if="sr.appointments && sr.appointments.length == 0">Schedule Appointment</button>
+              <button class="btn waves-effect waves-light" style="margin: 5px;" @click="toggleScheduleForm(sr.incident_id)" v-if="sr.appointments && sr.appointments.length == 0">Schedule Appointment</button>
             </div>
           </div>
           <div v-if="showScheduleForm && currentIncidentId === sr.incident_id" class="row schedule-form">
@@ -445,6 +448,31 @@ export default {
       } catch (error) {
         console.error('Error exporting checklist:', error);
       }
+    },
+    generateEmail(sr) {
+      let emailBody = "Hello ";
+
+      const recipient = sr.on_behalf_of ? sr.on_behalf_of : sr.customer_name;
+      emailBody += recipient + ",\n\n";
+
+      emailBody += `All the items for Service Request #${sr.incident_id} have been received by inventory. I would like to schedule the delivery/install at your earliest convenience. Please let me know the best time to proceed.\n\n`;
+
+      sr.items.forEach(item => {
+        if (item.item_description.toLowerCase().includes("sit stand")) {
+          emailBody += "Note: The setup for sit/stand desks can take up to an hour.\n";
+        } else if (item.item_description.toLowerCase().includes("monitor arm")) {
+          emailBody += "Note: The setup for monitor arms can take around 40 minutes.\n";
+        }
+      });
+      emailBody += `Please note that the delivery/install does not require your presence and can be done on a day you are teleworking or on Friday.\n\n`;
+
+      emailBody += `Also, please verify if you are located at ${sr.location}.\n\nThank you.\n\n`;
+
+      // Create a mailto link
+      const mailtoLink = `mailto:?subject=Service Request ${sr.incident_id} Delivery/Install&body=${encodeURIComponent(emailBody)}`;
+
+      // Open the mailto link
+      window.location.href = mailtoLink;
     }
   },
   computed: {
