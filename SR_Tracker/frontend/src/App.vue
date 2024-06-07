@@ -8,7 +8,7 @@
           </svg>
         </button>
         <a href="#" class="brand-logo center">SR Tracker</a>
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
+        <ul id="nav-mobile" class="right">
           <li>
             <UploadForm @file-uploaded="handleFileUpload" />
           </li>
@@ -163,7 +163,6 @@
   </div>
 </template>
 
-
 <script>
 import axios from 'axios';
 import UploadForm from './components/UploadForm.vue';
@@ -216,20 +215,16 @@ export default {
         console.error('Error fetching SRs:', error);
       }
     },
-    handleFileUpload(file) {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      axios.post('http://localhost:5000/upload', formData, {
-          headers: {
-              'Content-Type': 'multipart/form-data'
-          }
+    handleFileUpload(fileData) {
+      axios.post('http://localhost:5000/upload', {
+        name: fileData.name,
+        type: fileData.type,
+        content: fileData.content
       }).then(response => {
-          console.log('Parsed data:', response.data.data);
-          // Update your application state with the parsed data
-          this.fetchSrs();
+        console.log('Parsed data:', response.data.data);
+        this.fetchSrs();
       }).catch(error => {
-          console.error('Error uploading file:', error);
+        console.error('Error uploading file:', error);
       });
     },
     async exportData() {
@@ -529,6 +524,7 @@ export default {
   },
 };
 </script>
+
 <style>
 @import 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css';
 
