@@ -58,7 +58,10 @@ db.run(`CREATE TABLE IF NOT EXISTS appointments (
 )`);
 
 const upload = multer({ dest: 'uploads/' });
+
 const openai = new OpenAI(api_key=process.env.OPENAI_API_KEY,);
+
+
 
 app.post('/api/auto-populate-ai', async (req, res) => {
   const { requestId } = req.body;
@@ -405,6 +408,13 @@ app.post('/import', (req, res) => {
       }
     });
   });
+});
+
+// Serve the frontend
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 app.listen(PORT, () => {
